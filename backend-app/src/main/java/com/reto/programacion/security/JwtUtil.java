@@ -1,9 +1,6 @@
 package com.reto.programacion.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,6 +44,10 @@ public class JwtUtil {
         }
     }
 
+    /*public String extractRole(String token) {
+        return (String) extractAllClaims(token).get("rol");
+    }*/
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -60,4 +61,29 @@ public class JwtUtil {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
+
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public boolean validateRefreshToken(String token, UserDetails userDetails) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return claims.getSubject().equals(userDetails.getUsername()) &&
+                    claims.getExpiration().after(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

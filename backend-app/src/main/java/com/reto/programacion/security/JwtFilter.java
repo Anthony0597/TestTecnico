@@ -28,37 +28,64 @@ public class JwtFilter extends OncePerRequestFilter {
     private Claims claims = null;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws IOException, ServletException {
 
-        if(request.getServletPath().matches("/usuarios/login|/usuarios/singup")){
+        // Permitir endpoints públicos sin procesar el token
+        if (request.getServletPath().matches("/auth/login|/auth/singup")) {
             filterChain.doFilter(request, response);
-        }else {
-            String tokenHeader = request.getHeader("Authorization");
-            String token = null;
-            if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
-                token = tokenHeader.substring(7);
-                if (TokenBlackList.isBlacklisted(token)) {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
-                    return;
-                }
-                username = jwtUtil.extractUsername(token);
-                claims = jwtUtil.extractAllClaims(token);
-            }
+            return;
+        }
 
-            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if(jwtUtil.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    new WebAuthenticationDetailsSource().buildDetails(request);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            }
-            if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-                filterChain.doFilter(request, response);
+        String tokenHeader = request.getHeader("Authorization");
+        String token = null;
+        String username = null;
+        Claims claims = null;
+
+        // Extraer y validar token
+        if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
+            token = tokenHeader.substring(7);
+
+            // Validar token no vacío
+            if (token.isBlank()) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token vacío");
                 return;
             }
-            filterChain.doFilter(request, response);
+
+            // Verificar blacklist
+            if (TokenBlackList.isBlacklisted(token)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+                return;
+            }
+
+            try {
+                username = jwtUtil.extractUsername(token);
+                claims = jwtUtil.extractAllClaims(token);
+            } catch (Exception e) {
+                logger.error("Error procesando token JWT: ", e);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+                return;
+            }
         }
+
+        // Cargar autenticación si el token es válido
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            if (jwtUtil.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+
+        filterChain.doFilter(request, response);
     }
 
     public Boolean isAdmin(){

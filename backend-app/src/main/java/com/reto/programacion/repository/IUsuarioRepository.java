@@ -12,4 +12,5 @@ import java.util.Optional;
 @Transactional
 public interface IUsuarioRepository extends JpaRepository<Usuario, Integer> {
     Optional<Usuario> findByEmail(String email);
+    Optional<Usuario> findByRefreshTokenHash(String refreshToken);
 }
