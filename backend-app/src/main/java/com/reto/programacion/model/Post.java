@@ -21,10 +21,12 @@ public class Post {
     private String contenido;
     @Column(name = "post_fecha_publicacion")
     private LocalDateTime fechaPublicacion;
-    @Column(name = "privado")
-    private Boolean privado;
+    @Column(name = "post_fecha_modificacion")
+    private LocalDateTime fechaModificacion;
+    @Column(name = "post_status")
+    private Boolean status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private Usuario usuario;

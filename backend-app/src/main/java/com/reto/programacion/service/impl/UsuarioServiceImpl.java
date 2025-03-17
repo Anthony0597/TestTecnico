@@ -8,6 +8,7 @@ import com.reto.programacion.security.UsuarioDetailsService;
 import com.reto.programacion.service.IUsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,14 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Autowired
     private IUsuarioRepository usuarioRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private UsuarioDetailsService userDetailsService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
     public List<Usuario> findAll() {
@@ -45,7 +54,27 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public Usuario update(Usuario usuario) {
-        return usuarioRepository.save(usuario);
+        System.out.println("Hola");
+        // Obtén la entidad gestionada desde la base de datos
+        Usuario usuarioExistente = usuarioRepository.findById(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        System.out.println(usuarioExistente.getNombre());
+
+        usuarioExistente.setNombre(usuario.getNombre());
+        usuarioExistente.setApellido(usuario.getApellido());
+        usuarioExistente.setTelefono(usuario.getTelefono());
+        usuarioExistente.setRole(usuario.getRole());
+        usuarioExistente.setNacionalidad(usuario.getNacionalidad());
+        usuarioExistente.setGenero(usuario.getGenero());
+        String aux =passwordEncoder.encode(usuario.getContrasena());
+        System.out.println(aux);
+        usuarioExistente.setContrasena(aux);
+
+        System.out.println(usuarioExistente.getContrasena());
+
+        // Guarda la entidad gestionada con los cambios
+        return usuarioRepository.save(usuarioExistente);
     }
 
     @Override

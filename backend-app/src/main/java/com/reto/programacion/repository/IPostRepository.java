@@ -12,5 +12,5 @@ import java.util.List;
 @Transactional
 public interface IPostRepository extends JpaRepository<Post, Integer> {
     public List<Post> findByUsuario_Id(Integer userId);
-    List<Post> findByPrivado(Boolean privado);
+    List<Post> findByStatus(Boolean status);
 }

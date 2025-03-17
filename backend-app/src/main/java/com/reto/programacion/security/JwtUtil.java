@@ -24,7 +24,7 @@ public class JwtUtil {
 
     public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+        claims.put("rol", role);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
@@ -44,9 +44,9 @@ public class JwtUtil {
         }
     }
 
-    /*public String extractRole(String token) {
+    public String extractRole(String token) {
         return (String) extractAllClaims(token).get("rol");
-    }*/
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -7,14 +7,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -33,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws IOException, ServletException {
 
         // Permitir endpoints públicos sin procesar el token
-        if (request.getServletPath().matches("/auth/login|/auth/singup")) {
+        if (request.getServletPath().matches("/auth/login|/auth/singup|/posts/allpublic")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -71,14 +73,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Cargar autenticación si el token es válido
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            // Extraer el rol del token, asumiendo que está en el claim "rol"
+            String role = claims.get("rol", String.class);
+            List<GrantedAuthority> authorities = List.of(
+                    new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())
+            );
 
+            // Validar token contra el userDetails si lo necesitas (opcional)
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (jwtUtil.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails,
+                                userDetails, // o puedes pasar username
                                 null,
-                                userDetails.getAuthorities()
+                                authorities // asignamos las autoridades extraídas del token
                         );
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -53,7 +53,7 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL,  fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Post> posts;
 
