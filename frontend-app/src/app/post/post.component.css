@@ -1,0 +1,22 @@
+@import url(../home/home.component.css);
+
+textarea {
+    overflow: scroll;
+    resize:  initial;
+}
+
+textarea::-webkit-scrollbar {
+  background: transparent;
+  width: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  border-radius: 30px;
+  border: 2px solid #F2D388;
+  background: #C98474;
+  width: 15px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: black;
+}

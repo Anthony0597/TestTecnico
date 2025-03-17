@@ -1,0 +1,14 @@
+/* .center-login{
+    display: flex;
+    align-items: center;
+  justify-content: center;
+} */
+
+.text-bg-dark{
+  background-color:#C98474 !important;
+}
+
+.card{
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: bolder;
+}

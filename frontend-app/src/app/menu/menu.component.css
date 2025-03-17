@@ -1,0 +1,8 @@
+
+.title, .myIcons{
+    font-size: 2rem;
+}
+.scaled:hover{
+    transition: 0.3s;
+    transform: scale(1.2);
+}

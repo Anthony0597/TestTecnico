@@ -1,0 +1,235 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-usuario-table
+      author: your_name
+      preConditions:
+        - not:
+            tableExists:
+              tableName: usuario
+      changes:
+        - createTable:
+            tableName: usuario
+            columns:
+              - column:
+                  name: user_id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_nombre
+                  type: VARCHAR(255)
+              - column:
+                  name: user_apellido
+                  type: VARCHAR(255)
+              - column:
+                  name: user_genero
+                  type: VARCHAR(255)
+              - column:
+                  name: user_nacionalidad
+                  type: VARCHAR(255)
+              - column:
+                  name: user_telefono
+                  type: VARCHAR(255)
+              - column:
+                  name: user_email
+                  type: VARCHAR(255)
+                  constraints:
+                    unique: true
+              - column:
+                  name: user_contrasena
+                  type: VARCHAR(60)
+              - column:
+                  name: refresh_token_hash
+                  type: VARCHAR(60)
+              - column:
+                  name: refresh_token_expiry
+                  type: DATETIME2
+              - column:
+                  name: role
+                  type: VARCHAR(50)
+      preConditions:
+        - onFail: MARK_RAN
+
+  - changeSet:
+      id: create-post-table
+      author: your_name
+      preConditions:
+        - not:
+            tableExists:
+              tableName: post
+      changes:
+        - createTable:
+            tableName: post
+            columns:
+              - column:
+                  name: post_id
+                  type: INT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: post_titulo
+                  type: VARCHAR(255)
+              - column:
+                  name: post_contenido
+                  type: NVARCHAR(MAX)
+              - column:
+                  name: post_fecha_publicacion
+                  type: DATETIME2
+              - column:
+                  name: post_fecha_modificacion
+                  type: DATETIME2
+              - column:
+                  name: post_status
+                  type: BIT
+              - column:
+                  name: user_id
+                  type: INT
+                  constraints:
+                    nullable: false
+      preConditions:
+        - onFail: MARK_RAN
+
+  - changeSet:
+      id: add-post-usuario-fk
+      author: your_name
+      preConditions:
+        - not:
+            foreignKeyConstraintExists:
+              constraintName: fk_post_usuario
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: post
+            baseColumnNames: user_id
+            constraintName: fk_post_usuario
+            referencedTableName: usuario
+            referencedColumnNames: user_id
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+      preConditions:
+        - onFail: MARK_RAN
+
+  - changeSet:
+      id: insert-initial-usuarios
+      author: your_name
+      preConditions:
+        - tableExists:
+            tableName: usuario
+        - sqlCheck:
+            sql: "SELECT COUNT(*) FROM usuario"
+            expectedResult: "0"
+      changes:
+        - insert:
+            tableName: usuario
+            columns:
+              - column:
+                  name: user_nombre
+                  value: "Juan"
+              - column:
+                  name: user_apellido
+                  value: "Pérez"
+              - column:
+                  name: user_genero
+                  value: "Masculino"
+              - column:
+                  name: user_nacionalidad
+                  value: "Mexicana"
+              - column:
+                  name: user_telefono
+                  value: "555-1234"
+              - column:
+                  name: user_email
+                  value: "juan.perez@example.com"
+              - column:
+                  name: user_contrasena
+                  value: "$2a$10$EjemploDeHashBCrypt"
+              - column:
+                  name: role
+                  value: "USER"
+        - insert:
+            tableName: usuario
+            columns:
+              - column:
+                  name: user_nombre
+                  value: "Ana"
+              - column:
+                  name: user_apellido
+                  value: "Gómez"
+              - column:
+                  name: user_genero
+                  value: "Femenino"
+              - column:
+                  name: user_nacionalidad
+                  value: "Española"
+              - column:
+                  name: user_telefono
+                  value: "555-5678"
+              - column:
+                  name: user_email
+                  value: "ana.gomez@example.com"
+              - column:
+                  name: user_contrasena
+                  value: "$2a$10$OtroEjemploDeHashBCrypt"
+              - column:
+                  name: role
+                  value: "ADMIN"
+      preConditions:
+        - onFail: MARK_RAN
+
+  - changeSet:
+      id: insert-initial-posts
+      author: your_name
+      preConditions:
+        - tableExists:
+            tableName: post
+        - sqlCheck:
+            sql: "SELECT COUNT(*) FROM post"
+            expectedResult: "0"
+      changes:
+        - insert:
+            tableName: post
+            columns:
+              - column:
+                  name: post_titulo
+                  value: "Primer Post"
+              - column:
+                  name: post_contenido
+                  value: "Este es el contenido del primer post."
+              - column:
+                  name: post_fecha_publicacion
+                  valueDate: "2023-10-01T12:00:00"
+              - column:
+                  name: post_fecha_modificacion
+                  valueDate: "2023-10-01T12:00:00"
+              - column:
+                  name: post_status
+                  valueBoolean: true
+              - column:
+                  name: user_id
+                  valueNumeric: 1
+        - insert:
+            tableName: post
+            columns:
+              - column:
+                  name: post_titulo
+                  value: "Segundo Post"
+              - column:
+                  name: post_contenido
+                  value: "Este es el contenido del segundo post."
+              - column:
+                  name: post_fecha_publicacion
+                  valueDate: "2023-10-02T14:30:00"
+              - column:
+                  name: post_fecha_modificacion
+                  valueDate: "2023-10-02T14:30:00"
+              - column:
+                  name: post_status
+                  valueBoolean: true
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+      preConditions:
+        - onFail: MARK_RAN

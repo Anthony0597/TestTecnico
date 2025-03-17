@@ -1,5 +1,54 @@
 /* You can add global styles to this file, and also import other style files */
-@import "tailwindcss";
-@import "flowbite/src/themes/default";
-@plugin "flowbite/plugin";
-@source "../node_modules/flowbite";
+
+html{
+    scroll-snap-type: y mandatory !important;   
+}
+#bg-jose{
+    background-color: #D2D79F;
+}
+/* https://colorhunt.co/palette/a7d2cbf2d388c98474874c62 */
+.myFooter{
+    position: fixed;
+    bottom: 0;
+    height: 4%;
+    width: 100vw;
+    background-color: rgb(0, 0, 0);
+    text-align: center;
+    color: white;
+}
+
+.myFooter a{
+    color: white !important;
+    text-decoration: none !important;
+}
+.myFooter a:hover{
+    text-decoration: underline !important;    
+}
+
+
+.myContainer::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+.myCoontainer::-webkit-scrollbar:vertical {
+    width:10px;
+}
+
+.myCoontainer::-webkit-scrollbar-button:increment,.myCoontainer::-webkit-scrollbar-button {
+    display: none;
+} 
+
+.myCoontainer::-webkit-scrollbar:horizontal {
+    height: 10px;
+}
+
+.myCoontainer::-webkit-scrollbar-thumb {
+    background-color: #797979;
+    border-radius: 20px;
+    border: 2px solid #f1f2f3;
+}
+
+.myCoontainer::-webkit-scrollbar-track {
+    border-radius: 10px;  
+}
+

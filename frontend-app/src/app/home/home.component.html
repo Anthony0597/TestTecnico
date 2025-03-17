@@ -1,0 +1,128 @@
+<div class="container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="card text-bg-dark mb-3 mt-5">
+                <!-- mt-3 mb-3 -->
+                <div class="card-header">
+                    Agregar Tema
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-plus-circle-fill"></i>
+                        </div>
+                        <!--  --> <input [(ngModel)]="newTopic.title" type="text" class="form-control">
+                        <!-- enlazammos el inptut con esta variable -->
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <input (click)="createTopic()" type="button" value="Agregar" class="btn btn-success float-end">
+                    <!-- mandaria el topic al servidor para actualiaz el dato en la tabla -->
+                </div>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+
+    <div class="row">
+        <table class="table table-striped mt-4">
+            <!-- table-dark table-striped table-hover -->
+            <thead class="myThead">
+                <tr>
+                    <td> 🆔 Id </td>
+                    <td>Tema</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <tr *ngFor="let topic of topics">
+                    <!-- topic = index -->
+                    <!-- recorrer el arrelgo de "topics" -->
+                    <td>{{topic.id}}</td>
+                    <td>{{topic.title}}</td>
+                    <td>
+                        <div class="float-end">
+                        <button *ngIf="user.role == 'admin' || user.id == topic.user_id" data-bs-toggle="modal"
+                            data-bs-target="#editTopic" (click)="selectTmpTopic(topic)"
+                            class="btn btn-outline-success btn-sm me-lg-3 mb-sm-2">
+                            <i class="bi bi-pen-fill"></i></button>
+
+                        <button *ngIf="user.role == 'admin' || user.id == topic.user_id" data-bs-toggle="modal"
+                            data-bs-target="#deleteTopic" (click)="selectTmpTopic(topic)" class="btn btn-outline-danger
+                          btn-sm   "><i class="bi bi-trash2-fill"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- paginacion -->
+        <nav class="navPagination">
+            <ul class="pagination justify-content-center mt-3 mb-5">
+
+
+
+
+
+                <ng-container *ngFor="let page of pages">
+
+
+                    <!-- recorrer las paginas que envie el servidor -->
+                    <li class="page-item">
+                        <button class="page-link" (click)="readTopics(page.url)" [class.active]="page.active">
+                            <!-- si --page == true-- usamos la clase active de bootstrap   c : true -->
+
+                            {{page.label}}
+                        </button>
+                    </li>
+                    <!--label nos dice el numero de pagina (json)  -->
+                </ng-container>
+            </ul>
+
+        </nav>
+    </div>
+</div>
+
+
+<!-- Modal editar tema-->
+<div class=" modal fade" id="editTopic" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-brush"></i> Editar tema </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input [(ngModel)]="tmpTopic.title" type="text" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button (click)="cancel()" type="button" class="btn btn-outline-secondary"
+                    data-bs-dismiss="modal">Cancelar</button>
+                <button (click)="updateTopic()" type="button" class="btn btn-outline-success"
+                    data-bs-dismiss="modal">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal elimiar tema-->
+<div class="modal fade" id="deleteTopic" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"> Eliminar tema 🗑️</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- <input [(ngModel)]="tmpTopic.title" type="text" class="form-control"> -->
+                ¿Esta seguro de eliminiar el tema <b>{{tmpTopic.title}}</b> ?
+            </div>
+            <div class="modal-footer">
+                <button (click)="cancel()" type="button" class="btn btn-outline-secondary"
+                    data-bs-dismiss="modal">No</button>
+                <button (click)="deleteTopic()" type="button" class="btn btn-outline-danger"
+                    data-bs-dismiss="modal">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
